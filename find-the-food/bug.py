@@ -1,5 +1,6 @@
 import pygame
 import math
+import tensorflow as tf
 
 class Bug:
     def __init__(self, x, y, screen, screen_width, screen_height):
@@ -43,11 +44,11 @@ class Bug:
         self.screen.blit(rotated_bug, rotated_rect)
 
         # Print the current angle (optional)
-        font = pygame.font.Font(None, 24)
-        text = f"Angle: {math.degrees(self.angle):.2f}"
-        text_surface = font.render(text, True, (255, 255, 255))
-        text_rect = text_surface.get_rect(topleft=(10, 10))
-        self.screen.blit(text_surface, text_rect)
+        # font = pygame.font.Font(None, 24)
+        # text = f"Angle: {math.degrees(self.angle):.2f}"
+        # text_surface = font.render(text, True, (255, 255, 255))
+        # text_rect = text_surface.get_rect(topleft=(10, 10))
+        # self.screen.blit(text_surface, text_rect)
         
     def move(self, rotation_change, speed_adjust):
         # Clamp rotation change within -1 to 1
@@ -76,3 +77,24 @@ class Bug:
         # Update position
         self.x += dx
         self.y += dy
+
+class BugWithBrain(Bug):
+    def __init__(self, x, y, screen, screen_width, screen_height):
+        super().__init__(x, y, screen, screen_width, screen_height)
+        # Initialize TensorFlow model here
+        # Example: Simple feedforward neural network
+        self.model = tf.keras.Sequential([
+            tf.keras.layers.Dense(16, activation='relu', input_shape=(2,)),  # Input: (x, y) position
+            tf.keras.layers.Dense(2)  # Output: rotation_change, speed_adjust
+        ])
+        self.model.compile(optimizer='adam', loss='mse')
+
+    def get_action(self, current_position):
+        # Normalize position to range [0, 1]
+        normalized_position = [current_position[0] / self.screen_width, 
+                            current_position[1] / self.screen_height]
+        # Convert to TensorFlow Tensor
+        input_tensor = tf.convert_to_tensor([normalized_position], dtype=tf.float32) 
+        # Predict action from the model
+        action = self.model.predict(input_tensor)
+        return action[0][0], action[0][1] 
