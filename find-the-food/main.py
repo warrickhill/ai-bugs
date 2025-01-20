@@ -3,10 +3,10 @@ import pygame
 pygame.init() 
   
 # CREATING CANVAS 
-canvas = pygame.display.set_mode((500, 500)) 
+canvas = pygame.display.set_mode((1000, 800)) 
   
 # TITLE OF CANVAS 
-pygame.display.set_caption("My Board") 
+pygame.display.set_caption("Bugs Ai - Find the food") 
 exit = False
   
 while not exit: 
